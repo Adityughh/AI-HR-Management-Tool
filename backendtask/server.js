@@ -21,6 +21,180 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
   console.log('Connected to MongoDB');
 });
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'employee'],
+        default: 'employee'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+
+const roleSchema = new mongoose.Schema({
+    roleName: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    permissions: {
+        type: [String],
+        required: true
+    }
+});
+
+const Role = mongoose.model('Role', roleSchema);
+
+module.exports = Role;
+
+const employeeSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
+    },
+    salary: {
+        type: Number,
+        required: true
+    },
+    image: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'employee'],
+        default: 'employee'
+    },
+    id: {
+        type: Number,
+        required: true,
+        unique: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const Employee = mongoose.model('Employee', employeeSchema);
+
+module.exports = Employee;
+
+const departmentSchema = new mongoose.Schema({
+    departmentName: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee'
+    }
+});
+
+const Department = mongoose.model('Department', departmentSchema);
+
+module.exports = Department;
+
+const attendanceSchema = new mongoose.Schema({
+    employeeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee',
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['Present', 'Absent', 'Leave'],
+        required: true
+    }
+});
+
+const Attendance = mongoose.model('Attendance', attendanceSchema);
+
+module.exports = Attendance;
+
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://0.0.0.0:27017/yourDatabaseName', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
+
+const User = require('./models/user');
+const Role = require('./models/role');
+const Employee = require('./models/employee');
+const Department = require('./models/department');
+const Attendance = require('./models/attendance');
+
+const bcrypt = require('bcrypt');
+
+const createEmployee = async () => {
+    const hashedPassword = await bcrypt.hash('password123', 10);
+
+    const newEmployee = new Employee({
+        name: 'Jane Doe',
+        email: 'jane.doe@example.com',
+        password: hashedPassword,
+        address: '456 Elm St, Anytown, USA',
+        salary: 60000,
+        image: 'jane_doe.png',
+        id: 2
+    });
+
+    try {
+        const savedEmployee = await newEmployee.save();
+        console.log('Employee created:', savedEmployee);
+    } catch (error) {
+        console.error('Error creating employee:', error);
+    }
+};
+
+createEmployee();
+
 
 const employeeSchema = new mongoose.Schema({
     name: String,
