@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 import { exec } from 'child_process';
 
 
-mongoose.connect('mongodb://0.0.0.0:27017/empmern', {
+mongoose.connect(mongodb://localhost:27017/crud, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
